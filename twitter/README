@@ -1,0 +1,12 @@
+Installation:
+
+    Install python virtual environment used for updater script (update-tweets.py).
+    Requires recent python version and virtualenv.
+
+    $ make install
+
+Usage:
+
+    Fetch updates from twitter using the api. The hashtag is specified in the Makefile.
+
+    $ make update
