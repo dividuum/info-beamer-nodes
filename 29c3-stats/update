@@ -1,0 +1,3 @@
+#!/bin/sh
+wget http://dashboard.congress.ccc.de/current.json -O dash.json 
+wget http://94.45.247.251:4223/ -O gsm.json
