@@ -1,0 +1,8 @@
+Installation:
+
+    Set hashtag in the file `hashtag`
+
+Usage:
+    
+    Call `update` script every X minutes to fetch
+    new tweets

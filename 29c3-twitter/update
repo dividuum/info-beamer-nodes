@@ -1,0 +1,2 @@
+#!/bin/sh
+python update-tweets.py `cat hashtag`
