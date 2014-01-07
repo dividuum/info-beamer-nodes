@@ -5,24 +5,20 @@ local interval = 10
 util.auto_loader(_G)
 
 local distort_shader = resource.create_shader([[
-    void main() {
-        gl_TexCoord[0] = gl_MultiTexCoord0;
-        gl_FrontColor = gl_Color;
-        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    }
-]], [[
-    uniform sampler2D tex;
+    uniform sampler2D Texture;
     uniform float effect;
+    varying vec2 TexCoord;
+    uniform vec4 Color;
     void main() {
-        vec2 uv = gl_TexCoord[0].st;
+        vec2 uv = TexCoord.st;
         vec4 col;
-        col.r = texture2D(tex,vec2(uv.x+sin(uv.y*20.0*effect)*0.2,uv.y)).r;
-        col.g = texture2D(tex,vec2(uv.x+sin(uv.y*25.0*effect)*0.2,uv.y)).g;
-        col.b = texture2D(tex,vec2(uv.x+sin(uv.y*30.0*effect)*0.2,uv.y)).b;
-        col.a = texture2D(tex,vec2(uv.x,uv.y)).a;
-        vec4 foo = vec4(1,1,1,effect);
+        col.r = texture2D(Texture, vec2(uv.x+sin(uv.y*20.0*effect)*0.2,uv.y)).r;
+        col.g = texture2D(Texture, vec2(uv.x+sin(uv.y*25.0*effect)*0.2,uv.y)).g;
+        col.b = texture2D(Texture, vec2(uv.x+sin(uv.y*30.0*effect)*0.2,uv.y)).b;
+        col.a = texture2D(Texture, vec2(uv.x,uv.y)).a;
+        vec4 foo = vec4(1.0,1.0,1.0,effect);
         col.a = 1.0;
-        gl_FragColor = gl_Color * col * foo;
+        gl_FragColor = Color * col * foo;
     }
 ]])
 
