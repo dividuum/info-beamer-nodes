@@ -1,0 +1,45 @@
+{
+    "devices": {
+        "2429607372": "Saal 2",
+        "179616622":  "Saal G",
+        "786785340":  "Saal 1",
+        "3508445120": "Saal 2",
+        "1805160172": "Saal 6"
+    },
+    "rooms": {
+        "Saal 1": {
+            "dect": "8001",
+            "translation": "8011",
+            "twitter": "#hall1",
+            "irc": "#30c3-hall-1",
+            "texture": "marble",
+            "speed": 70
+        },
+        "Saal 2": {
+            "dect": "8002",
+            "translation": "8012",
+            "twitter": "#hall2",
+            "irc": "#30c3-hall-2",
+            "texture": "marble",
+            "speed": 70
+        },
+        "Saal 6": {
+            "dect": "8006",
+            "translation": "8016",
+            "twitter": "#hall6",
+            "irc": "#30c3-hall-6",
+            "texture": "marble",
+            "speed": 70
+        },
+        "Saal G": {
+            "dect": "8004",
+            "translation": "8014",
+            "twitter": "#hallG",
+            "irc": "#30c3-hall-G",
+            "texture": "marble",
+            "speed": 70
+        },
+        "Saal 17": true,
+        "Lounge": true
+    }
+}
