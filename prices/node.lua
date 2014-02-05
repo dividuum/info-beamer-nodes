@@ -67,65 +67,51 @@ function Preisliste(preise, x, y, spacing, size)
 end
 
 local logo_shader = resource.create_shader([[
+    uniform sampler2D Texture;
+    varying vec2 TexCoord;
+    uniform vec4 Color;
     void main() {
-        gl_TexCoord[0] = gl_MultiTexCoord0;
-        gl_FrontColor = gl_Color;
-        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    }
-]], [[
-    uniform sampler2D tex;
-    void main() {
-        vec2 uv = gl_TexCoord[0].st;
-        vec4 texel = texture2D(tex, gl_TexCoord[0].st);
-        gl_FragColor = gl_Color * texel;
+        vec4 texel = texture2D(Texture, TexCoord.st);
+        // gl_FragColor = Color * texel;
         gl_FragColor = vec4(1.0, 1.0, 1.0, texel.a);
     }
 ]])
 
 local distort_shader = resource.create_shader([[
-    void main() {
-        gl_TexCoord[0] = gl_MultiTexCoord0;
-        gl_FrontColor = gl_Color;
-        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    }
-]], [[
-    uniform sampler2D tex;
+    uniform sampler2D Texture;
+    varying vec2 TexCoord;
+    uniform vec4 Color;
     uniform float effect;
     void main() {
-        vec2 uv = gl_TexCoord[0].st;
+        vec2 uv = TexCoord.st;
         vec4 col;
-        col.r = texture2D(tex,vec2(uv.x+effect+sin(uv.y*20.0*effect)*0.02,uv.y)).r;
-        col.g = texture2D(tex,vec2(uv.x+effect+sin(uv.y*30.0*effect)*0.02,uv.y)).g;
-        col.b = texture2D(tex,vec2(uv.x-effect+sin(uv.y*40.0*effect)*0.02,uv.y)).b;
-        col.a = texture2D(tex,vec2(uv.x,uv.y)).a;
-        gl_FragColor = gl_Color * col;
+        col.r = texture2D(Texture,vec2(uv.x+effect+sin(uv.y*20.0*effect)*0.02,uv.y)).r;
+        col.g = texture2D(Texture,vec2(uv.x+effect+sin(uv.y*30.0*effect)*0.02,uv.y)).g;
+        col.b = texture2D(Texture,vec2(uv.x-effect+sin(uv.y*40.0*effect)*0.02,uv.y)).b;
+        col.a = texture2D(Texture,vec2(uv.x,uv.y)).a;
+        gl_FragColor = Color * col;
     }
 ]])
  
  
 local crt_shader = resource.create_shader([[
-    void main() {
-        gl_TexCoord[0] = gl_MultiTexCoord0;
-        gl_FrontColor = gl_Color;
-        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    }
-]], [[
-    uniform vec2 resolution;
     uniform float time;
-    uniform sampler2D tex0;
+    uniform sampler2D Texture;
+    varying vec2 TexCoord;
+    uniform vec4 Color;
 
     void main(void)
     {
-        vec2 q = gl_FragCoord.xy / resolution.xy;
+        vec2 q = TexCoord;
         vec2 uv = 0.5 + (q-0.5)*(0.98 + 0.0002*sin(0.2*time));
 
-        vec3 oricol = texture2D(tex0,vec2(q.x,1.0-q.y)).xyz;
+        vec3 oricol = texture2D(Texture,vec2(q.x,1.0-q.y)).xyz;
         vec3 col;
 
         float fnord = sin(time*1.0) * 0.001;
-        col.r = texture2D(tex0,vec2(uv.x+fnord,uv.y)).x;
-        col.g = texture2D(tex0,vec2(uv.x+0.000,uv.y)).y;
-        col.b = texture2D(tex0,vec2(uv.x-fnord,uv.y)).z;
+        col.r = texture2D(Texture,vec2(uv.x+fnord,uv.y)).x;
+        col.g = texture2D(Texture,vec2(uv.x+0.000,uv.y)).y;
+        col.b = texture2D(Texture,vec2(uv.x-fnord,uv.y)).z;
 
         col = clamp(col*0.5+0.5*col*col*1.2,0.0,1.0);
         col *= 0.5 + 0.5*16.0*uv.x*uv.y*(1.0-uv.x)*(1.0-uv.y);
@@ -323,7 +309,6 @@ function node.render()
         gl.ortho()
     logo_shader:deactivate()
     util.post_effect(crt_shader, {
-        resolution = {WIDTH, HEIGHT},
         time = sys.now(),
     })
     
