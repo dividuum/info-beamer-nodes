@@ -1,0 +1,183 @@
+#!/usr/bin/python
+import re
+import os
+import sys
+import time
+import json
+import pytz
+import datetime
+import httplib
+import socket
+from calendar import timegm
+import xml.etree.ElementTree as ET
+from itertools import islice
+
+udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+met = pytz.timezone("Europe/Berlin")
+
+def efa_fetch(path):
+    conn = httplib.HTTPConnection("mobil.efa.de", 80)
+    conn.request("GET", path)
+    res = conn.getresponse()
+    data = res.read()
+    return data
+
+def parse(data, stop):
+    req = ET.fromstring(data).find('itdDepartureMonitorRequest')
+
+    def parse_date(node):
+        dt = node.find('itdDateTime')
+        date = dt.find('itdDate')
+        time = dt.find('itdTime')
+        dt = datetime.datetime(int(date.get('year')), int(date.get('month')), int(date.get('day')),
+                                 int(time.get('hour')), int(time.get('minute')))
+        dt2 = dt.replace(tzinfo=met)
+        dt2 = dt2.astimezone(pytz.utc)
+        dt2 = dt2.replace(tzinfo=None)
+        timestamp = int(timegm(dt2.timetuple()))
+        return dt, timestamp
+
+    types = dict(
+        (e.get('value'), e.text) 
+        for e in req.find('itdTripOptions').find('itdPtOptions').find('excludedMeans').findall('meansElem')
+    )
+
+    departures = []
+    for dep in req.find('itdDepartureList').findall('itdDeparture'):
+        date, ts = parse_date(dep)
+
+        line = dep.find('itdServingLine')
+        symbol = line.get('symbol')
+        type = types[line.get('motType')]
+
+        if type == 'Zug' and re.match('^S[0-9]+$', symbol):
+            print "ignoring S-Bahn"
+            continue
+
+        if type == 'Zug' and re.match('^[0-9]+$', symbol):
+            type = 'Stadtbus'
+
+        if type == 'Zug' and re.match('^U[0-9]+$', symbol):
+            type = 'U-Bahn'
+        
+        if type == 'Zug':
+            icon = 'zug'
+        else:
+            icon = (type + re.match('^([^ ]+).*', symbol).group(1)).lower()
+        if not os.path.exists(icon + ".png"):
+            print("icon not found: %r" % (icon,))
+            continue
+
+        direction = line.get('direction')
+        # direction = direction.replace('Hamburg', 'HH')
+        if direction.startswith('Hamburg, '):
+            direction = direction[9:]
+        if direction.startswith('Hamburg-'):
+            direction = direction[8:]
+
+        if type == 'Zug':
+            more = re.match("([a-z]+ [0-9]+) .*", symbol, re.I).group(1)
+        else:
+            more = ""
+
+        departures.append(((date, direction), dict(
+            symbol = symbol,
+            platform = dep.get('platformName'),
+            date = ts,
+            direction = direction,
+            type = type,
+            nice_date = date.strftime('%H:%M'),
+            icon = icon,
+            more = more,
+            stop = stop,
+        )))
+    return departures
+
+def get_schedule():
+    departures = []
+    departures.extend(parse(
+        efa_fetch("/mobile3/XSLT_DM_REQUEST?outputFormat=XML&useAllStops=1&useRealtime=1&maxAssignedStops=1&itOptionsActive=1&trITMOTvalue100=5&itdLPxx_dest=&sessionID=0&language=de&locationServerActive=1&mode=direct&limit=60&itdLPxx_script=true&name_dm=28511951&type_dm=stopID&placeInfo_dm=Hamburg"),
+        "Dammtor"
+    ))
+    departures.extend(parse(
+        efa_fetch("/mobile3/XSLT_DM_REQUEST?outputFormat=XML&useAllStops=1&useRealtime=1&maxAssignedStops=1&itOptionsActive=1&trITMOTvalue100=5&itdLPxx_dest=&sessionID=0&language=de&locationServerActive=1&mode=direct&limit=60&itdLPxx_script=true&name_dm=28511901&type_dm=stopID&placeInfo_dm=Hamburg"),
+        "Stephansplatz"
+    ))
+
+    departures.sort()
+    departures = [info for sort_key, info in departures]
+
+    # find next run
+    for n, dep in enumerate(departures):
+        for follow in islice(departures, n+1, None):
+            if dep['direction'] == follow['direction'] and \
+                    dep['type'] == follow['type'] and \
+                    dep['stop'] == follow['stop'] and \
+                    dep['symbol'] == follow['symbol']:
+                dep['next_date'] = follow['date']
+                dep['next_nice_date'] = follow['nice_date']
+                break
+
+    # find duplicates
+    for n, dep in enumerate(departures):
+        for follow in islice(departures, n+1, None):
+            if dep['direction'] == follow['direction'] and \
+                    dep['type'] == follow['type'] and \
+                    dep['stop'] != follow['stop'] and \
+                    dep['symbol'] == follow['symbol'] and \
+                    abs(dep['date'] - follow['date']) < 5 * 60:
+                # print "duplicate:"
+                # print dep
+                # print follow
+                # print
+                dep['duplicate'] = True
+                break
+
+    def clean(departure):
+        del departure['symbol']
+        del departure['type']
+        return departure
+
+    departures = [clean(dep) for dep in departures if not 'duplicate' in dep]
+
+    # from pprint import pprint
+    # pprint(departures, width=300)
+    
+    return json.dumps(departures,ensure_ascii=False).encode("utf8")
+
+def current_time():
+    now = datetime.datetime.utcnow()
+    timestamp = timegm(now.timetuple()) + now.microsecond / 1000000.
+    now = now.replace(tzinfo=pytz.utc)
+    now = now.astimezone(met)
+    now = now.replace(tzinfo=None)
+    return now, timestamp
+
+def send_clock():
+    now, timestamp = current_time()
+    udp.sendto('departures/clock/set:%f' % timestamp, ('127.0.0.1', 4444))
+
+def update():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('127.0.0.1', 4444))
+    s.recv(1000)
+    s.send("departures\n")
+    s.recv(1000)
+    departures = get_schedule()
+    print >>sys.stderr, "departures size: ", len(departures)
+    s.send(departures)
+    s.send("\n")
+    s.close()
+
+def main():
+    time.sleep(5)
+    send_clock()
+    while 1:
+        update()
+        for i in xrange(6):
+            time.sleep(30)
+            send_clock()
+
+if __name__ == "__main__":
+    main()
