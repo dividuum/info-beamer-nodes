@@ -16,7 +16,9 @@ pictures = util.generator(function()
     end
     return out
 end)
-node.event("content_remove", pictures.remove)
+node.event("content_remove", function(filename)
+    pictures:remove(filename)
+end)
 
 util.set_interval(INTERVAL, function()
     local next_image_name = pictures.next()

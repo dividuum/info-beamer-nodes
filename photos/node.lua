@@ -11,7 +11,9 @@ pictures = util.generator(function()
     end
     return out
 end)
-node.event("content_remove", pictures.remove)
+node.event("content_remove", function(filename)
+    pictures:remove(filename)
+end)
 
 local out_effect = math.random() * 3
 local in_effect = math.random() * 3
