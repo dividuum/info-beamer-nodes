@@ -1,0 +1,34 @@
+A simple remote controlled slide show
+=====================================
+
+1) Start info-beamer with this directory:
+
+    $ info-beamer .
+
+2) Put the images you want to display into this 
+   directory. You also delete or add images later.
+
+3) Open a TCP connection to the running info-beamer
+   program:
+
+   telnet localhost 4444
+
+4) Send "slideshow". This will bind your TCP connection
+   to the running slideshow code. You'll see an "ok!"
+   response from info-beamer.
+
+5) Send JSON formatted commands to start showing your
+   images:
+
+   {"filename": "image.jpg", "transition": "flip", "duration": 1}
+
+   info-beamer will start the transition specified and switch to
+   the image specified by 'filename'.
+
+
+You can also control the running info-beamer using a simple 
+echo command and netcat:
+
+$ echo -en 'slideshow\n{"filename": "image.jpg", "transition": "blend1"}\n' | netcat localhost 4444
+
+For a list of available transitions, see the node.lua source code.
