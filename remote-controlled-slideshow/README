@@ -8,6 +8,9 @@ A simple remote controlled slide show
 2) Put the images you want to display into this 
    directory. You also delete or add images later.
 
+   Maximum image size is 2048x2048 pixel. Both
+   JPEG and PNG are supported.
+
 3) Open a TCP connection to the running info-beamer
    program:
 
@@ -31,4 +34,6 @@ echo command and netcat:
 
 $ echo -en 'slideshow\n{"filename": "image.jpg", "transition": "blend1"}\n' | netcat localhost 4444
 
-For a list of available transitions, see the node.lua source code.
+For a list of available transitions, see the node.lua source code. 
+You should probably also change the resolution in the gl.setup line
+inside node.lua to match your native resolution of your display.
