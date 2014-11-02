@@ -1,0 +1,2 @@
+#!/bin/bash
+echo -n "radio/set:$1" > /dev/udp/localhost/4444
