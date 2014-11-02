@@ -28,7 +28,6 @@ local angle = 0
 util.data_mapper{
     set = function(float_idx)
         angle = tonumber(float_idx) * angle_per_item
-        print(angle)
     end
 }
 
