@@ -118,6 +118,9 @@ local current_image = resource.create_colored_texture(0, 0, 0, 1)
 -- 1) tcp connection to info-beamer:4444
 -- 2) send "slideshow"
 -- 3) send json data
+--
+-- alternatively:
+-- 1) send slideshow:<json> to info-beamer:4444 on udp
 node.alias("slideshow")
 
 -- This function gets called when a complete line is sent using
@@ -126,7 +129,7 @@ node.alias("slideshow")
 -- {"filename": "1.jpg", "transition": "crossfade", "duration": 3}
 -- {"filename": "2.jpg", "transition": "flip", "duration": 1}
 
-node.event("input", function(line)
+function decode_command(line)
     local cmd = json.decode(line)
     switch = {
         transition = transitions[cmd.transition];
@@ -135,7 +138,10 @@ node.event("input", function(line)
         start = nil; -- gets filled in start_switch state
     }
     state = "start_switch"
-end)
+end
+
+node.event("input", decode_command) -- listen to TCP
+node.event("data", decode_command)  -- listen to UDP
 
 function node.render()
     if state == "idle" then

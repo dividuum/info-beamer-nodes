@@ -11,28 +11,37 @@ A simple remote controlled slide show
    Maximum image size is 2048x2048 pixel. Both
    JPEG and PNG are supported.
 
-3) Open a TCP connection to the running info-beamer
-   program:
+3a) Open a TCP connection to the running info-beamer
+    program:
 
-   telnet localhost 4444
+    telnet localhost 4444
 
-4) Send "slideshow". This will bind your TCP connection
-   to the running slideshow code. You'll see an "ok!"
-   response from info-beamer.
+4a) Send "slideshow". This will bind your TCP connection
+    to the running slideshow code. You'll see an "ok!"
+    response from info-beamer.
 
-5) Send JSON formatted commands to start showing your
-   images:
+5a) Send JSON formatted commands to start showing your
+    images:
 
-   {"filename": "image.jpg", "transition": "flip", "duration": 1}
+    {"filename": "image.jpg", "transition": "flip", "duration": 1}
 
-   info-beamer will start the transition specified and switch to
-   the image specified by 'filename'.
+    info-beamer will start the transition specified and switch to
+    the image specified by 'filename'.
 
+Or:
 
-You can also control the running info-beamer using a simple 
-echo command and netcat:
+ 3b) Send commands in the following format to the running info-beamer
+     program using UDP:
+
+     slideshow:{"filename": "image.jpg", "transition": "flip", "duration": 1}
+
+You can control the running info-beamer using a simple echo command and netcat:
 
 $ echo -en 'slideshow\n{"filename": "image.jpg", "transition": "blend1"}\n' | netcat localhost 4444
+
+Or using UDP:
+
+$ echo -en 'slideshow:{"filename": "image.jpg", "transition": "blend1"}' | netcat localhost 4444 -u
 
 For a list of available transitions, see the node.lua source code. 
 You should probably also change the resolution in the gl.setup line
