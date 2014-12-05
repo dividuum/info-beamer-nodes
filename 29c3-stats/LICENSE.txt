@@ -1,0 +1,4 @@
+Font is Source Code:
+  http://store1.adobe.com/cfusion/store/html/index.cfm?event=displayFont&code=SOUC10003050
+
+json.lua is MIT licensed (see source code)
