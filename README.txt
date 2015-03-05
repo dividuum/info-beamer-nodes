@@ -1,3 +1,3 @@
-Example repository for info-beamer (http://info-beamer.org/).
+Example repository for code runnable using info-beamer (https://info-beamer.com/).
 
 Feel free to fork and contribute.
