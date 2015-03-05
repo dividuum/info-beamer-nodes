@@ -4,4 +4,8 @@ Installation:
 
 Usage:
 
-    Copy jpg files into this directory.
+    Copy jpg or png files into this directory. Files will
+    be played in the order based on their filename.
+
+    There are some settings in the first few lines of
+    node.lua that you can change.

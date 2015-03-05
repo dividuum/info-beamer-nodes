@@ -1,6 +1,6 @@
 local COUNTDOWN = 3
 
-gl.setup(1024, 768)
+gl.setup(NATIVE_WIDTH, NATIVE_HEIGHT)
 
 pictures = util.generator(function()
     local out = {}

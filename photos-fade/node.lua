@@ -1,34 +1,38 @@
+-- at which intervals should the screen switch to the
+-- next image?
 local INTERVAL = 10
 
-local SWITCH_DELAY = 3 -- enough time to load next image
+-- enough time to load next image
+local SWITCH_DELAY = 1
 
--- use 'export INFOBEAMER_USE_HW_JPEG=1' if you are using the
--- raspberry pi version for faster jpeg loading
+-- transition time in seconds.
+-- set it to 0 switching instantaneously
+local SWITCH_TIME = 1.0
+
+assert(SWITCH_TIME + SWITCH_DELAY < INTERVAL,
+    "INTERVAL must be longer than SWITCH_DELAY + SWITCHTIME")
 
 gl.setup(NATIVE_WIDTH, NATIVE_HEIGHT)
 
-function is_valid_image(name)
-    return name:match(".*jpg")
+local function alphanumsort(o)
+    local function padnum(d) return ("%03d%s"):format(#d, d) end
+    table.sort(o, function(a,b)
+        return tostring(a):gsub("%d+",padnum) < tostring(b):gsub("%d+",padnum)
+    end)
+    return o
 end
-pictures = util.generator(function()
-    local out = {}
+
+local pictures = util.generator(function()
+    local files = {}
     for name, _ in pairs(CONTENTS) do
-        if is_valid_image(name) then
-            out[#out + 1] = name
+        if name:match(".*jpg") or name:match(".*png") then
+            files[#files+1] = name
         end
     end
-    return out
+    return alphanumsort(files) -- sort files by filename
 end)
-
 node.event("content_remove", function(filename)
-    print("image removed ", filename)
     pictures:remove(filename)
-end)
-node.event("content_update", function(filename)
-    if is_valid_image(filename) then
-        print("image added ", filename)
-        pictures:add(filename)
-    end
 end)
 
 util.set_interval(INTERVAL, function()
@@ -36,17 +40,18 @@ util.set_interval(INTERVAL, function()
     print("now loading " .. next_image_name)
     last_image = current_image
     current_image = resource.load_image(next_image_name)
-    fade_start = sys.now() + SWITCH_DELAY
+    fade_start = sys.now()
 end)
 
 function node.render()
     gl.clear(0,0,0,1)
-    local delta = sys.now() - fade_start
+    local delta = sys.now() - fade_start - SWITCH_DELAY
     if last_image and delta < 0 then
         util.draw_correct(last_image, 0, 0, WIDTH, HEIGHT)
-    elseif last_image and delta < 1 then
-        util.draw_correct(last_image, 0, 0, WIDTH, HEIGHT, 1 - delta)
-        util.draw_correct(current_image, 0, 0, WIDTH, HEIGHT, delta)
+    elseif last_image and delta < SWITCH_TIME then
+        local progress = delta / SWITCH_TIME
+        util.draw_correct(last_image, 0, 0, WIDTH, HEIGHT, 1 - progress)
+        util.draw_correct(current_image, 0, 0, WIDTH, HEIGHT, progress)
     else
         if last_image then
             last_image:dispose()
