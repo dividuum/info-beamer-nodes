@@ -1,5 +1,4 @@
--- gl.setup(NATIVE_WIDTH, NATIVE_HEIGHT)
-gl.setup(600, 600)
+gl.setup(NATIVE_WIDTH, NATIVE_HEIGHT)
 
 local res = util.auto_loader()
 
@@ -9,11 +8,10 @@ local function gauge(conf)
     local size = conf.size or 150
     local value = 0
     local function draw()
-        value = value + 0.04
         res.gauge:draw(x-size/2, y-size/2, x+size/2, y+size/2)
         gl.pushMatrix()
         gl.translate(x+0.5, y+0.5)
-        gl.rotate(-134 + 270 * value, 0, 0, 1)
+        gl.rotate(-135 + 271 * value, 0, 0, 1)
         res.needle:draw(-size/2, -size/2, size/2, size/2,0.8)
         gl.popMatrix()
     end
