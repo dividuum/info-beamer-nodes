@@ -30,7 +30,7 @@ local layers = resource.create_shader[[
 
 function node.render()
     layers:use{
-        offset = sys.now()*0.2;
+        offset = sys.now()*0.2 % 1;
         l1 = res.lights;
         l2 = res.middle;
         l3 = res.front;
