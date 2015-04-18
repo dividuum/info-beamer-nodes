@@ -8,7 +8,7 @@ end
 
 local Display = function(display_cols, display_rows)
     local t = resource.load_image "letters.png"
-    local mapping = ' ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789@#-.,:?!()'
+    local mapping = ' abcdefghijklmnopqrstuvwxyzäöü0123456789@#-.,:?!()'
 
     local function make_mapping(cols, rows, tw, th)
         local chars = {}
@@ -41,7 +41,7 @@ local Display = function(display_cols, display_rows)
             assert(#value <= rowsize)
             value = value .. string.rep(" ", rowsize-#value)
             for i = 1, rowsize do
-                local char = string.sub(value,i,i):upper()
+                local char = string.sub(value,i,i):lower()
                 local pos = string.find(mapping, char, 1, true)
                 if not pos then
                     pos = 1 -- character not found

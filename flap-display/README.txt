@@ -20,5 +20,7 @@ Even using just the (bash) shell:
 all in one line:
 (echo -en "display\n"; while true; do echo "##go_up##"; head -n 10 /proc/meminfo; sleep 1; done) > /dev/tcp/localhost/4444
 
+You must send your data encoded as latin1. The following letters are valid:
+' abcdefghijklmnopqrstuvwxyzäöü0123456789@#-.,:?!()'
 
 letters.png created by https://github.com/MichaelKreil
