@@ -32,9 +32,11 @@ local Display = function(display_cols, display_rows)
             end
             return out
         end
+
         local current = mkzeros(rowsize)
         local target  = mkzeros(rowsize)
         local function set(value)
+
             assert(#value <= rowsize)
             value = value .. string.rep(" ", rowsize-#value)
             for i = 1, rowsize do
@@ -43,11 +45,11 @@ local Display = function(display_cols, display_rows)
                 if not pos then
                     pos = 1 -- character not found
                 end
-                local offset = (pos-1) * 5
-                target[i] = offset
+                target[i] = (pos-1) * 5
             end
         end
         set("")
+
         local function tick()
             for i = 1, rowsize do
                 if current[i] ~= target[i] then
@@ -58,6 +60,7 @@ local Display = function(display_cols, display_rows)
                 end
             end
         end
+
         local function draw(y, charh)
             local charw = WIDTH / rowsize
             local margin = 2
@@ -65,6 +68,7 @@ local Display = function(display_cols, display_rows)
                 charmap[current[i]+1]((i-1)*charw+margin, y+margin, i*charw-margin, y+charh-margin)
             end
         end
+
         return {
             set = set;
             tick = tick;
