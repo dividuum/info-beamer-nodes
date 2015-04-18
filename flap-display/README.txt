@@ -14,5 +14,11 @@ ok!
 connected
 Hello display
 
+You can of course automatically send information to info-beamer.
+Even using just the (bash) shell:
+
+all in one line:
+(echo -en "display\n"; while true; do echo "##go_up##"; head -n 10 /proc/meminfo; sleep 1; done) > /dev/tcp/localhost/4444
+
 
 letters.png created by https://github.com/MichaelKreil
