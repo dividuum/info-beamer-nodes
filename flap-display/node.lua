@@ -1,3 +1,5 @@
+-- vim: set fileencoding=latin1:
+
 gl.setup(1920, 1080)
 
 if not sys.provides "subimage-draw" then
@@ -36,7 +38,6 @@ local Display = function(display_cols, display_rows)
         local current = mkzeros(rowsize)
         local target  = mkzeros(rowsize)
         local function set(value)
-
             assert(#value <= rowsize)
             value = value .. string.rep(" ", rowsize-#value)
             for i = 1, rowsize do
@@ -48,7 +49,6 @@ local Display = function(display_cols, display_rows)
                 target[i] = (pos-1) * 5
             end
         end
-        set("")
 
         local function tick()
             for i = 1, rowsize do
