@@ -1,6 +1,8 @@
 gl.setup(NATIVE_WIDTH, NATIVE_HEIGHT)
 
-local NUM_COLUMNS = 4
+local NUM_COLUMNS = 5
+local SPEED = 80
+
 local IMAGE_WIDTH = WIDTH / NUM_COLUMNS
 local IMAGE_HEIGHT = HEIGHT / NUM_COLUMNS
 
@@ -59,16 +61,17 @@ local Column = function(x)
         for i = 1, #images do
             local image = images[i]
             image.obj.tick(dt)
-            image.y = image.y - dt * 100
+            image.y = image.y - dt * SPEED
             y = image.y + IMAGE_HEIGHT
         end
 
-        while y < HEIGHT + 100 do
+        while y < HEIGHT + SPEED do
+            local img_y = y + 10 + math.random() * 20;
             images[#images+1] = {
-                y = y + 10;
+                y = img_y;
                 obj = Image(pictures.next());
             }
-            y = y + IMAGE_HEIGHT + math.random() * 30 + 20
+            y = img_y + IMAGE_HEIGHT + 10
         end
 
         assert(#images > 0)
