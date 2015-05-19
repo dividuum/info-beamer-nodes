@@ -32,10 +32,7 @@ def parse(data, stop):
         time = dt.find('itdTime')
         dt = datetime.datetime(int(date.get('year')), int(date.get('month')), int(date.get('day')),
                                  int(time.get('hour')), int(time.get('minute')))
-        dt2 = dt.replace(tzinfo=met)
-        dt2 = dt2.astimezone(pytz.utc)
-        dt2 = dt2.replace(tzinfo=None)
-        timestamp = int(timegm(dt2.timetuple()))
+        timestamp = int(timegm(met.localize(dt).astimezone(pytz.utc).timetuple()))
         return dt, timestamp
 
     types = dict(
