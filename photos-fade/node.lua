@@ -35,13 +35,18 @@ node.event("content_remove", function(filename)
     pictures:remove(filename)
 end)
 
-util.set_interval(INTERVAL, function()
+local current_image, fade_start
+
+local function next_image()
     local next_image_name = pictures.next()
     print("now loading " .. next_image_name)
     last_image = current_image
     current_image = resource.load_image(next_image_name)
     fade_start = sys.now()
-end)
+end
+
+util.set_interval(INTERVAL, next_image)
+next_image()
 
 function node.render()
     gl.clear(0,0,0,1)
