@@ -120,15 +120,16 @@ local function prepare()
         local s = sprites[i]
         local img = r[s.img]
         if not s.sw then
-            if img:state() == "loaded" then
-	        s.sw, s.sh = img:size()
+            local w, h = img:size()
+            if w > 1 and h > 1 then
+                s.sw, s.sh = w, h
                 if s.gr then
-                   s.sh = s.sh / 1.5
+                    s.sh = s.sh / 1.5
                 end
-	    else
+            else
                 return false
             end
-	end
+        end
     end
     return true
 end
