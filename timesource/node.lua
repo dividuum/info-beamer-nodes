@@ -9,7 +9,11 @@
 
         echo -en "time/start:" > /dev/udp/localhost/4444
 
-    to start the time again.
+    to start the time again. While the
+    time source if running or stopped you
+    can rewind it to 0 by calling
+
+        echo -en "time/rewind:" > /dev/udp/localhost/4444
 
 ]]--
 
@@ -39,10 +43,19 @@ local time = (function()
         end
     end;
 
+    local function rewind()
+        if stopped then
+            base = 0
+        else
+            base = sys.now()
+        end
+    end
+
     return {
         now = now;
         stop = stop;
         start = start;
+        rewind = rewind;
     }
 end)()
 
@@ -53,6 +66,7 @@ node.alias "time"
 util.data_mapper{
     ["stop"]  = time.stop;
     ["start"] = time.start;
+    ["rewind"] = time.rewind;
 }
 
 function node.render()
