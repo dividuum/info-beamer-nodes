@@ -1,0 +1,25 @@
+[{
+    "duration": 4,
+    "lines": [
+        "X                X",
+        "                  ",
+        "    THIS IS AN    ",
+        "    AUTOMATED     ",
+        "    SIGN TEST.    ",
+        "                  ",
+        "                  ",
+        "X                X"
+    ]
+}, {
+    "duration": 5,
+    "lines": [
+        "                  ",
+        "                  ",
+        "    DRIVE NOT     ",
+        "   TALK OR TEXT   ",
+        "                  ",
+        "                  ",
+        "                  ",
+        "                  "
+    ]
+}]
