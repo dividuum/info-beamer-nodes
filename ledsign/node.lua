@@ -22,7 +22,7 @@ local function lines_from_string(str)
     local lines = {}
     for idx = 1, ROWS do
         local offset = 1 + (idx-1) * COLS
-        lines[idx] = rpad(str:sub(offset, offset+COLS), COLS, ' ')
+        lines[idx] = rpad(str:sub(offset, offset+COLS-1), COLS, ' ')
     end
     return lines
 end
