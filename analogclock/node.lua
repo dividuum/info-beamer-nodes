@@ -1,5 +1,7 @@
 gl.setup(1024, 1024)
-util.auto_loader(_G)
+
+local dot = resource.load_image "dot.png"
+local white = resource.create_colored_texture(1,1,1,1)
 
 local base_time = N.base_time or 0
 
