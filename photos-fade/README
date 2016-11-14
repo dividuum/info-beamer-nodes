@@ -9,3 +9,6 @@ Usage:
 
     There are some settings in the first few lines of
     node.lua that you can change.
+
+    If you want to have your media files into a subdirectory,
+    just set its name as MEDIA_DIRECTORY.

@@ -9,6 +9,15 @@ local SWITCH_DELAY = 1
 -- set it to 0 switching instantaneously
 local SWITCH_TIME = 1.0
 
+
+-- Media directory. Set to '' to have your
+-- images in the current directory.
+local MEDIA_DIRECTORY = ''
+-- local MEDIA_DIRECTORY = 'media'
+
+----------------------------------------------------------------
+local ALL_CONTENTS, ALL_CHILDS = node.make_nested()
+
 assert(SWITCH_TIME + SWITCH_DELAY < INTERVAL,
     "INTERVAL must be longer than SWITCH_DELAY + SWITCHTIME")
 
@@ -24,7 +33,7 @@ end
 
 local pictures = util.generator(function()
     local files = {}
-    for name, _ in pairs(CONTENTS) do
+    for name, _ in pairs(ALL_CONTENTS[MEDIA_DIRECTORY]) do
         if name:match(".*jpg") or name:match(".*png") then
             files[#files+1] = name
         end
@@ -35,7 +44,8 @@ node.event("content_remove", function(filename)
     pictures:remove(filename)
 end)
 
-local current_image, fade_start
+local current_image = resource.create_colored_texture(0,0,0,0)
+local fade_start = 0
 
 local function next_image()
     local next_image_name = pictures.next()
@@ -44,9 +54,6 @@ local function next_image()
     current_image = resource.load_image(next_image_name)
     fade_start = sys.now()
 end
-
-util.set_interval(INTERVAL, next_image)
-next_image()
 
 function node.render()
     gl.clear(0,0,0,1)
@@ -65,3 +72,6 @@ function node.render()
         util.draw_correct(current_image, 0, 0, WIDTH, HEIGHT)
     end
 end
+
+util.set_interval(INTERVAL, next_image)
+
