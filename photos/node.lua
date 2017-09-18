@@ -37,6 +37,7 @@ function node.render()
     local time_to_next = next_image_time - sys.now()
     if time_to_next < 0 then
         if next_image then
+            current_image:dispose()
             current_image = next_image
             next_image = nil
             next_image_time = sys.now() + COUNTDOWN
